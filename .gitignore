@@ -7,6 +7,9 @@ obj/
 *.sln.docstates
 *.userprefs
 
+## VS
+.vs/
+
 ## Build results
 [Dd]ebug/
 [Rr]elease/
