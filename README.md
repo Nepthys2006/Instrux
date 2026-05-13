@@ -146,59 +146,6 @@ Instrux.App/
 
 ---
 
-## Features by Tab
-
-Each tab provides full CRUD with an inline form panel below a read-only DataGrid:
-
-- **Teacher Profiles** — Name, nickname, email management
-- **School Classes** — Create classes with name, subject, section, term, color
-- **Students** — Enroll students in classes with student IDs and email
-- **Attendance** — Daily attendance with status (Present/Absent/Late/Escused); student dropdown filters by selected class
-- **Content Items** — Share URLs/resources per class with type tags
-- **Assessments** — Define assessments with max scores per class
-- **Grades** — Record scores per student per assessment
-- **Calendar Events** — Schedule events with date, time range, category
-- **Todo Items** — Personal task list with priority and due dates
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- .NET SDK 10.0 or later
-- SQL Server LocalDB (comes with Visual Studio or SQL Server Express)
-
-### Setup & Run
-
-```bash
-# Clone the repository
-git clone https://github.com/Nepthys2006/Instrux.git
-cd Instrux
-
-# Create and apply the database migration
-dotnet ef database update -p Instrux.Infrastructure -s Instrux.App
-
-# Launch the application
-dotnet run --project Instrux.App
-```
-
-The database `InstruxDb` is automatically created in LocalDB with all tables, indexes, and foreign keys.
-
-### Configuration
-
-Connection string is in `Instrux.App/appsettings.json`:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=InstruxDb;Trusted_Connection=True;TrustServerCertificate=True;"
-  }
-}
-```
-
----
-
 ## Database Schema
 
 Nine tables with cascade deletes on parent-child relationships:
