@@ -1,0 +1,59 @@
+<UserControl x:Class="Instrux.App.Views.Tabs.SchoolClassTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}"
+                  SelectedItem="{Binding SelectedItem}"
+                  AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="*" />
+                <DataGridTextColumn Header="Section" Binding="{Binding Section}" Width="*" />
+                <DataGridTextColumn Header="Term" Binding="{Binding Term}" Width="*" />
+                <DataGridTextColumn Header="Color" Binding="{Binding ColorHex}" Width="*" />
+                <DataGridTextColumn Header="Students" Binding="{Binding StudentCount}" Width="80" />
+                <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt, StringFormat={}{0:g}}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="1" Padding="8" Margin="0,8,0,0"
+                BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" CornerRadius="4">
+            <StackPanel>
+                <WrapPanel Margin="0,0,0,6">
+                    <TextBlock Text="Name:" Width="80" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding FormName}" Width="240" />
+                </WrapPanel>
+                <WrapPanel Margin="0,0,0,6">
+                    <TextBlock Text="Subject:" Width="80" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding FormSubject}" Width="240" />
+                </WrapPanel>
+                <WrapPanel Margin="0,0,0,6">
+                    <TextBlock Text="Section:" Width="80" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding FormSection}" Width="240" />
+                </WrapPanel>
+                <WrapPanel Margin="0,0,0,6">
+                    <TextBlock Text="Term:" Width="80" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding FormTerm}" Width="240" />
+                </WrapPanel>
+                <WrapPanel Margin="0,0,0,6">
+                    <TextBlock Text="Color:" Width="80" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding FormColorHex}" Width="120" />
+                </WrapPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
+                    <Button Content="Add New" Command="{Binding AddNewCommand}" Margin="0,0,8,0" Padding="12,4" />
+                    <Button Content="{Binding SaveButtonText}" Command="{Binding SaveCommand}" Margin="0,0,8,0" Padding="12,4" />
+                    <Button Content="Delete" Command="{Binding DeleteCommand}" Padding="12,4" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

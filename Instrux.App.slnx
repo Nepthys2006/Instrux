@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Instrux.Domain/Instrux.Domain.csproj" />
+  <Project Path="Instrux.Services/Instrux.Services.csproj" />
+  <Project Path="Instrux.Infrastructure/Instrux.Infrastructure.csproj" />
+  <Project Path="Instrux.App/Instrux.App.csproj" />
+</Solution>

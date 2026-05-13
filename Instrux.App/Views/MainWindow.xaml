@@ -1,0 +1,39 @@
+<Window x:Class="Instrux.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tabs="clr-namespace:Instrux.App.Views.Tabs"
+        mc:Ignorable="d"
+        Title="Instrux — Test UI" Height="750" Width="1100"
+        WindowStartupLocation="CenterScreen">
+    <TabControl>
+        <TabItem Header="Teacher Profiles">
+            <tabs:TeacherProfileTab DataContext="{Binding TeacherProfileTab}" />
+        </TabItem>
+        <TabItem Header="School Classes">
+            <tabs:SchoolClassTab DataContext="{Binding SchoolClassTab}" />
+        </TabItem>
+        <TabItem Header="Students">
+            <tabs:StudentTab DataContext="{Binding StudentTab}" />
+        </TabItem>
+        <TabItem Header="Attendance">
+            <tabs:AttendanceRecordTab DataContext="{Binding AttendanceRecordTab}" />
+        </TabItem>
+        <TabItem Header="Content">
+            <tabs:ContentItemTab DataContext="{Binding ContentItemTab}" />
+        </TabItem>
+        <TabItem Header="Assessments">
+            <tabs:AssessmentTab DataContext="{Binding AssessmentTab}" />
+        </TabItem>
+        <TabItem Header="Grades">
+            <tabs:GradeTab DataContext="{Binding GradeTab}" />
+        </TabItem>
+        <TabItem Header="Calendar">
+            <tabs:CalendarEventTab DataContext="{Binding CalendarEventTab}" />
+        </TabItem>
+        <TabItem Header="To-Do">
+            <tabs:TodoItemTab DataContext="{Binding TodoItemTab}" />
+        </TabItem>
+    </TabControl>
+</Window>
