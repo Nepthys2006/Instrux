@@ -5,35 +5,121 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:tabs="clr-namespace:Instrux.App.Views.Tabs"
         mc:Ignorable="d"
-        Title="Instrux — Test UI" Height="750" Width="1100"
-        WindowStartupLocation="CenterScreen">
-    <TabControl>
-        <TabItem Header="Teacher Profiles">
-            <tabs:TeacherProfileTab DataContext="{Binding TeacherProfileTab}" />
-        </TabItem>
-        <TabItem Header="School Classes">
-            <tabs:SchoolClassTab DataContext="{Binding SchoolClassTab}" />
-        </TabItem>
-        <TabItem Header="Students">
-            <tabs:StudentTab DataContext="{Binding StudentTab}" />
-        </TabItem>
-        <TabItem Header="Attendance">
-            <tabs:AttendanceRecordTab DataContext="{Binding AttendanceRecordTab}" />
-        </TabItem>
-        <TabItem Header="Content">
-            <tabs:ContentItemTab DataContext="{Binding ContentItemTab}" />
-        </TabItem>
-        <TabItem Header="Assessments">
-            <tabs:AssessmentTab DataContext="{Binding AssessmentTab}" />
-        </TabItem>
-        <TabItem Header="Grades">
-            <tabs:GradeTab DataContext="{Binding GradeTab}" />
-        </TabItem>
-        <TabItem Header="Calendar">
-            <tabs:CalendarEventTab DataContext="{Binding CalendarEventTab}" />
-        </TabItem>
-        <TabItem Header="To-Do">
-            <tabs:TodoItemTab DataContext="{Binding TodoItemTab}" />
-        </TabItem>
-    </TabControl>
+        Title="Instrux" Height="800" Width="1280"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}"
+        TextElement.FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="{StaticResource SidebarBgBrush}">
+            <Grid Margin="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Logo / Brand -->
+                <Border Grid.Row="0" Padding="20,24,20,24"
+                        BorderBrush="#1E293B" BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="36" Height="36" CornerRadius="10"
+                                Background="{StaticResource PrimaryBrush}">
+                            <TextBlock Text="I" FontSize="20" FontWeight="Bold"
+                                       Foreground="White" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="White" Text="Instrux" />
+                            <TextBlock FontSize="10" Foreground="{StaticResource SidebarTextBrush}"
+                                       Text="Teacher Dashboard" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Navigation -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" Margin="0,8,0,0">
+                    <StackPanel Margin="8,0">
+                        <TextBlock Text="MAIN MENU" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#475569" Margin="12,12,0,8" />
+
+                        <RadioButton IsChecked="{Binding IsDashboardSelected}"
+                                     Command="{Binding NavigateToDashboardCommand}"
+                                     Style="{StaticResource SidebarNavItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                      Stroke="{StaticResource SidebarTextBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" />
+                                <TextBlock Text="Dashboard" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton IsChecked="{Binding IsClassesSelected}"
+                                     Command="{Binding NavigateToClassesCommand}"
+                                     Style="{StaticResource SidebarNavItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                                      Stroke="{StaticResource SidebarTextBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" />
+                                <TextBlock Text="My Classes" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton IsChecked="{Binding IsCalendarSelected}"
+                                     Command="{Binding NavigateToCalendarCommand}"
+                                     Style="{StaticResource SidebarNavItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      Stroke="{StaticResource SidebarTextBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" />
+                                <TextBlock Text="Calendar" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton IsChecked="{Binding IsTodosSelected}"
+                                     Command="{Binding NavigateToTodosCommand}"
+                                     Style="{StaticResource SidebarNavItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                                      Stroke="{StaticResource SidebarTextBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" />
+                                <TextBlock Text="To-Do List" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <!-- Quick Access -->
+                        <TextBlock Text="QUICK ACCESS" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#475569" Margin="12,24,0,8" />
+                        <ItemsControl ItemsSource="{Binding QuickAccessClasses}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding Name}"
+                                            Command="{Binding DataContext.NavigateToClassCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource SidebarQuickItemStyle}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Settings -->
+                <Button Grid.Row="2" Content="Settings"
+                        Margin="8,0,8,16"
+                        Command="{Binding NavigateToSettingsCommand}"
+                        Style="{StaticResource SidebarSettingStyle}" />
+            </Grid>
+        </Border>
+
+        <!-- Content Area -->
+        <ContentControl Grid.Column="1"
+                        Content="{Binding CurrentView}"
+                        Margin="32,0" />
+    </Grid>
 </Window>

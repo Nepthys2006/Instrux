@@ -3,50 +3,385 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Instrux.App.ViewModels"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="800">
+             d:DesignHeight="700" d:DesignWidth="1000">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}"
-                  SelectedItem="{Binding SelectedItem}"
-                  AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="2*" />
-                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat={}{0:d}}" Width="*" />
-                <DataGridTextColumn Header="Time" Binding="{Binding TimeRange}" Width="*" />
-                <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Grid.Row="1" Padding="8" Margin="0,8,0,0"
-                BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" CornerRadius="4">
-            <StackPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Title:" Width="80" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding FormTitle}" Width="240" />
-                </WrapPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Date:" Width="80" VerticalAlignment="Center" />
-                    <DatePicker SelectedDate="{Binding FormDate}" Width="240" />
-                </WrapPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Time:" Width="80" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding FormTimeRange}" Width="240" />
-                </WrapPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Category:" Width="80" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding FormCategory}" Width="240" />
-                </WrapPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
-                    <Button Content="Add New" Command="{Binding AddNewCommand}" Margin="0,0,8,0" Padding="12,4" />
-                    <Button Content="{Binding SaveButtonText}" Command="{Binding SaveCommand}" Margin="0,0,8,0" Padding="12,4" />
-                    <Button Content="Delete" Command="{Binding DeleteCommand}" Padding="12,4" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,24">
+            <!-- Header -->
+            <Grid Margin="0,24,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="Calendar" />
+                    <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,4,0,0"
+                               Text="Manage your schedule and events" />
                 </StackPanel>
-            </StackPanel>
+
+                <!-- Date Picker -->
+                <DatePicker Grid.Column="1"
+                            SelectedDate="{Binding SelectedDate}"
+                            VerticalAlignment="Center" Margin="0,0,12,0" />
+
+                <!-- Add Event -->
+                <Border Grid.Column="2" CornerRadius="8"
+                        Background="{StaticResource PrimaryBrush}">
+                    <Button Command="{Binding OpenAddDialogCommand}"
+                            Background="Transparent"
+                            Foreground="White" BorderThickness="0"
+                            Padding="16,8" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M12 4v16m8-8H4" Stroke="White" StrokeThickness="2"
+                                  Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                            <TextBlock Text="Add Event" FontSize="13" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+            </Grid>
+
+            <!-- Today's Events -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="4" Height="20"
+                                Background="{StaticResource PrimaryBrush}"
+                                CornerRadius="2" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Text="Today's Events" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding TodayEvents}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" Margin="0,0,0,8"
+                                        Background="{StaticResource BgBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock FontSize="14" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       Text="{Binding Title}" />
+                                            <TextBlock FontSize="11"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Margin="0,2,0,0">
+                                                <Run Text="{Binding TimeRange}" />
+                                                <Run Text="·" />
+                                                <Run Text="{Binding Category}" />
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <Border Grid.Column="1" Margin="0,0,8,0"
+                                                Padding="6,2"
+                                                Background="{StaticResource PrimaryLightBrush}"
+                                                CornerRadius="4" VerticalAlignment="Center">
+                                            <TextBlock FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource PrimaryBrush}"
+                                                       Text="{Binding Category}" />
+                                        </Border>
+
+                                        <Button Grid.Column="2" Width="28" Height="28"
+                                                Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" VerticalAlignment="Center"
+                                                Command="{Binding DataContext.DeleteEventCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="M6 18L18 6M6 6l12 12"
+                                                  Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.5"
+                                                  Width="14" Height="14" Stretch="Uniform" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty state -->
+                    <TextBlock Visibility="Collapsed" FontSize="12"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Text="No events today" HorizontalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TodayEvents.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding TodayEvents.Count}" Value="1">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding TodayEvents.Count}" Value="2">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Category Filter -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="16" Margin="0,0,0,20">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Filter:" FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="0,0,12,0" />
+                    <ItemsControl ItemsSource="{Binding CategoryOptions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton GroupName="CalendarFilter"
+                                             Content="{Binding}"
+                                             IsChecked="{Binding DataContext.FilterCategory,
+                                                RelativeSource={RelativeSource AncestorType=UserControl},
+                                                Converter={x:Null}}"
+                                             Margin="0,0,8,0">
+                                    <RadioButton.Style>
+                                        <Style TargetType="RadioButton">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="RadioButton">
+                                                        <Border x:Name="Border" Padding="10,6"
+                                                                CornerRadius="6" Cursor="Hand"
+                                                                Background="{StaticResource BgBrush}"
+                                                                BorderBrush="{StaticResource BorderBrush}"
+                                                                BorderThickness="1">
+                                                            <TextBlock FontSize="12"
+                                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                                       Text="{Binding}" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter TargetName="Border"
+                                                                        Property="Background"
+                                                                        Value="{StaticResource PrimaryBrush}" />
+                                                                <Setter TargetName="Border"
+                                                                        Property="TextElement.Foreground"
+                                                                        Value="White" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </RadioButton.Style>
+                                </RadioButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Upcoming Events -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="4" Height="20"
+                                Background="{StaticResource PurpleBrush}"
+                                CornerRadius="2" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Text="Upcoming Events" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding UpcomingEvents}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" Margin="0,0,0,8"
+                                        Background="{StaticResource BgBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Date Badge -->
+                                        <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8"
+                                                Background="{StaticResource PrimaryLightBrush}"
+                                                Margin="0,0,12,0" VerticalAlignment="Center">
+                                            <StackPanel VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock FontSize="11" FontWeight="Bold"
+                                                           Foreground="{StaticResource PrimaryBrush}"
+                                                           Text="{Binding Date, StringFormat={}{0:MMM}}"
+                                                           HorizontalAlignment="Center" />
+                                                <TextBlock FontSize="13" FontWeight="Bold"
+                                                           Foreground="{StaticResource PrimaryBrush}"
+                                                           Text="{Binding Date, StringFormat={}{0:dd}}"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock FontSize="14" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       Text="{Binding Title}" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <TextBlock FontSize="11"
+                                                           Foreground="{StaticResource TextMutedBrush}">
+                                                    <Run Text="{Binding TimeRange}" />
+                                                </TextBlock>
+                                                <TextBlock FontSize="11"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           Margin="6,0">
+                                                    <Run Text="·" />
+                                                </TextBlock>
+                                                <TextBlock FontSize="11"
+                                                           Foreground="{StaticResource TextMutedBrush}">
+                                                    <Run Text="{Binding Category}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="2" Width="28" Height="28"
+                                                Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" VerticalAlignment="Center"
+                                                Command="{Binding DataContext.DeleteEventCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="M6 18L18 6M6 6l12 12"
+                                                  Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.5"
+                                                  Width="14" Height="14" Stretch="Uniform" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+
+        <!-- Add Event Dialog -->
+        <Border Visibility="Collapsed" Background="#80000000" Panel.ZIndex="100">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsAddDialogOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border Width="420" Background="{StaticResource SurfaceBrush}"
+                    CornerRadius="16" Padding="28"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect BlurRadius="32" Opacity="0.2" ShadowDepth="8" Color="#000000" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="New Event" Margin="0,0,0,20" />
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Title</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,12">
+                        <TextBox Text="{Binding FormTitle}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                            <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,0,4">Date</TextBlock>
+                            <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+                                <DatePicker SelectedDate="{Binding FormDate}"
+                                            BorderThickness="0" Padding="6" />
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                            <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,0,4">Time</TextBlock>
+                            <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+                                <TextBox Text="{Binding FormTimeRange}" Padding="10,8"
+                                         BorderThickness="0" FontSize="13" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Category</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,20">
+                        <TextBox Text="{Binding FormCategory}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" CornerRadius="8"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                Margin="0,0,12,0">
+                            <Button Content="Cancel"
+                                    Command="{Binding CloseAddDialogCommand}"
+                                    Background="Transparent"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    BorderThickness="0" Padding="16,10" />
+                        </Border>
+                        <Border Grid.Column="1" CornerRadius="8"
+                                Background="{StaticResource PrimaryBrush}">
+                            <Button Content="Add Event"
+                                    Command="{Binding AddEventCommand}"
+                                    Background="Transparent"
+                                    Foreground="White" BorderThickness="0" Padding="24,10" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

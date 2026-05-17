@@ -1,0 +1,106 @@
+<UserControl x:Class="Instrux.App.Views.SettingsProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,24,0,24" MaxWidth="600">
+            <!-- Header -->
+            <StackPanel Margin="0,0,0,32">
+                <TextBlock FontSize="28" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}"
+                           Text="Settings" />
+                <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,4,0,0"
+                           Text="Manage your profile and preferences" />
+            </StackPanel>
+
+            <!-- Profile Section -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="28" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="24"
+                                Background="{StaticResource PrimaryLightBrush}">
+                            <TextBlock Text="T" FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
+                            <TextBlock FontSize="16" FontWeight="Bold"
+                                       Foreground="{StaticResource TextBrush}"
+                                       Text="Teacher Profile" />
+                            <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                       Text="Update your personal information" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Full Name</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,16">
+                        <TextBox Text="{Binding FullName}" Padding="12,10"
+                                 BorderThickness="0" FontSize="14" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Nickname</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,16">
+                        <TextBox Text="{Binding Nickname}" Padding="12,10"
+                                 BorderThickness="0" FontSize="14" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Email</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,24">
+                        <TextBox Text="{Binding Email}" Padding="12,10"
+                                 BorderThickness="0" FontSize="14" />
+                    </Border>
+
+                    <!-- Status Message -->
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12"
+                               Foreground="{StaticResource SuccessBrush}"
+                               Margin="0,0,0,12">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding StatusMessage}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusMessage}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <Border CornerRadius="8" Background="{StaticResource PrimaryBrush}"
+                            HorizontalAlignment="Right">
+                        <Button Command="{Binding SaveProfileCommand}"
+                                Background="Transparent"
+                                Foreground="White" BorderThickness="0"
+                                Padding="28,10" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M5 13l4 4L19 7" Stroke="White" StrokeThickness="2"
+                                      Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                                <TextBlock Text="Save Changes" FontSize="14" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,240 @@
+<UserControl x:Class="Instrux.App.Views.Tabs.DashboardTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dto="clr-namespace:Instrux.Services.DTOs;assembly=Instrux.Services"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,24">
+            <!-- Greeting -->
+            <StackPanel Margin="0,24,0,24">
+                <TextBlock FontSize="28" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}"
+                           Text="{Binding Greeting}" />
+                <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,4,0,0">
+                    <Run Text="Here's what's happening today, " />
+                    <Run Text="{Binding TodayDate}" />
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Stat Cards -->
+            <ItemsControl ItemsSource="{Binding StatCards}" Margin="0,0,0,24">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" Rows="1" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1" CornerRadius="12" Padding="20" Margin="4">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="8" Opacity="0.04" ShadowDepth="1" Color="#000000" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock FontSize="32" FontWeight="Bold"
+                                           Foreground="{StaticResource TextBrush}"
+                                           Text="{Binding Value}" />
+                                <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                           Text="{Binding Label}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Main Grid: Classes (2 cols) + Right Panel -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- My Classes -->
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <TextBlock FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextBrush}"
+                               Margin="0,0,0,12">
+                        <Run Text="My Classes" />
+                    </TextBlock>
+                    <ItemsControl ItemsSource="{Binding Classes}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="200" Margin="0,0,12,12"
+                                        Background="{StaticResource SurfaceBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="16"
+                                        Cursor="Hand">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Effect">
+                                                <Setter.Value>
+                                                    <DropShadowEffect BlurRadius="8" Opacity="0.04"
+                                                                      ShadowDepth="1" Color="#000000" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect BlurRadius="12" Opacity="0.12"
+                                                                              ShadowDepth="2" Color="#000000" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel>
+                                        <Border CornerRadius="8" Width="40" Height="40"
+                                                Background="{Binding ColorHex}"
+                                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                                            <Path Data="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                                                  Stroke="White" StrokeThickness="1.5"
+                                                  Width="20" Height="20" Stretch="Uniform"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock FontSize="15" FontWeight="Bold"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   Text="{Binding Name}" />
+                                        <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                                   Margin="0,2,0,0">
+                                            <Run Text="{Binding Subject}" />
+                                            <Run Text="•" />
+                                            <Run Text="{Binding Section}" />
+                                        </TextBlock>
+                                        <Border Background="{StaticResource PrimaryLightBrush}"
+                                                CornerRadius="4" Padding="6,2" Margin="0,10,0,0"
+                                                HorizontalAlignment="Left">
+                                            <TextBlock FontSize="10" Foreground="{StaticResource PrimaryBrush}"
+                                                       Text="{Binding Term}" />
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Right Panel: Today's Schedule + Priority Tasks -->
+                <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                    <!-- Today's Schedule -->
+                    <Border Background="{StaticResource SurfaceBrush}"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,16">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="8" Opacity="0.04" ShadowDepth="1" Color="#000000" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Path Data="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      Stroke="{StaticResource PrimaryBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,8,0" />
+                                <TextBlock FontSize="16" FontWeight="Bold"
+                                           Foreground="{StaticResource TextBrush}" Text="Today's Schedule" />
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding TodayEvents}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="8" Padding="12" Margin="0,0,0,8"
+                                                Background="{StaticResource BgBrush}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0" Width="3" CornerRadius="2"
+                                                        Background="{StaticResource PrimaryBrush}"
+                                                        Margin="0,0,12,0" />
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock FontSize="13" FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               Text="{Binding Title}" />
+                                                    <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
+                                                               Text="{Binding TimeRange}" Margin="0,2,0,0" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Priority Tasks -->
+                    <Border Background="{StaticResource SurfaceBrush}"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="12" Padding="16">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="8" Opacity="0.04" ShadowDepth="1" Color="#000000" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Path Data="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                                      Stroke="{StaticResource PrimaryBrush}" StrokeThickness="1.5"
+                                      Width="18" Height="18" Stretch="Uniform" Margin="0,0,8,0" />
+                                <TextBlock FontSize="16" FontWeight="Bold"
+                                           Foreground="{StaticResource TextBrush}">
+                                    <Run Text="Priority Tasks" />
+                                </TextBlock>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding PriorityTodos}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="8" Padding="12" Margin="0,0,0,8"
+                                                Background="{StaticResource BgBrush}">
+                                            <StackPanel>
+                                                <TextBlock FontSize="13" Foreground="{StaticResource TextBrush}"
+                                                           Text="{Binding Title}" />
+                                                <Border x:Name="UrgentBadge"
+                                                        Background="{StaticResource ErrorLightBrush}"
+                                                        CornerRadius="3" Padding="6,2"
+                                                        HorizontalAlignment="Left" Margin="0,6,0,0"
+                                                        Visibility="Collapsed">
+                                                    <TextBlock FontSize="9" FontWeight="Bold"
+                                                               Foreground="{StaticResource ErrorBrush}"
+                                                               Text="URGENT" />
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Priority}" Value="High">
+                                                <Setter TargetName="UrgentBadge" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

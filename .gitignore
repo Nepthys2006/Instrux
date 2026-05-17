@@ -41,3 +41,9 @@ bld/
 *.log
 *.tmp
 ~$*
+
+## Agent & Design files
+.agents/
+AGENTS.md
+DESIGN.md
+skills-lock.json

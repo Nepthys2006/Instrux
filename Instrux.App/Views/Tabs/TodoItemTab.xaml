@@ -4,49 +4,398 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="800">
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <Style x:Key="PriorityBadgeStyle" TargetType="Border">
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}"
-                  SelectedItem="{Binding SelectedItem}"
-                  AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="2*" />
-                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="*" />
-                <DataGridCheckBoxColumn Header="Done" Binding="{Binding IsCompleted}" Width="60" />
-                <DataGridTextColumn Header="Due Date" Binding="{Binding DueDate, StringFormat={}{0:d}}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Grid.Row="1" Padding="8" Margin="0,8,0,0"
-                BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" CornerRadius="4">
-            <StackPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Title:" Width="80" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding FormTitle}" Width="240" />
-                </WrapPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Priority:" Width="80" VerticalAlignment="Center" />
-                    <ComboBox Text="{Binding FormPriority}" Width="240" IsEditable="True">
-                        <ComboBoxItem Content="Low" />
-                        <ComboBoxItem Content="Medium" />
-                        <ComboBoxItem Content="High" />
-                    </ComboBox>
-                </WrapPanel>
-                <WrapPanel Margin="0,0,0,6">
-                    <TextBlock Text="Due Date:" Width="80" VerticalAlignment="Center" />
-                    <DatePicker SelectedDate="{Binding FormDueDate}" Width="240" />
-                </WrapPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
-                    <Button Content="Add New" Command="{Binding AddNewCommand}" Margin="0,0,8,0" Padding="12,4" />
-                    <Button Content="{Binding SaveButtonText}" Command="{Binding SaveCommand}" Margin="0,0,8,0" Padding="12,4" />
-                    <Button Content="Delete" Command="{Binding DeleteCommand}" Padding="12,4" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,24">
+            <!-- Header -->
+            <Grid Margin="0,24,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="To-Do List" />
+                    <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,4,0,0"
+                               Text="Stay organized with tasks and deadlines" />
                 </StackPanel>
-            </StackPanel>
+
+                <!-- Priority Filter -->
+                <ItemsControl Grid.Column="1" Margin="0,0,12,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton GroupName="TodoFilter"
+                                         Content="{Binding}"
+                                         IsChecked="{Binding DataContext.FilterPriority,
+                                            RelativeSource={RelativeSource AncestorType=UserControl},
+                                            Converter={x:Null}}"
+                                         Margin="0,0,4,0">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="RadioButton">
+                                                    <Border x:Name="Border" Padding="10,6"
+                                                            CornerRadius="6" Cursor="Hand"
+                                                            Background="{StaticResource BgBrush}"
+                                                            BorderBrush="{StaticResource BorderBrush}"
+                                                            BorderThickness="1">
+                                                        <TextBlock FontSize="12"
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Text="{Binding}" />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter TargetName="Border"
+                                                                    Property="Background"
+                                                                    Value="{StaticResource PrimaryBrush}" />
+                                                            <Setter TargetName="Border"
+                                                                    Property="TextElement.Foreground"
+                                                                    Value="White" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </RadioButton.Style>
+                            </RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Add TODO -->
+                <Border Grid.Column="2" CornerRadius="8"
+                        Background="{StaticResource PrimaryBrush}">
+                    <Button Command="{Binding OpenAddDialogCommand}"
+                            Background="Transparent"
+                            Foreground="White" BorderThickness="0"
+                            Padding="16,8" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M12 4v16m8-8H4" Stroke="White" StrokeThickness="2"
+                                  Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                            <TextBlock Text="Add Task" FontSize="13" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+            </Grid>
+
+            <!-- Pending Tasks -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="4" Height="20"
+                                Background="{StaticResource WarningBrush}"
+                                CornerRadius="2" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Text="Pending" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding PendingItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" Margin="0,0,0,8"
+                                        Background="{StaticResource BgBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Checkbox -->
+                                        <Border Grid.Column="0" Width="22" Height="22"
+                                                CornerRadius="11" Margin="0,0,12,0"
+                                                BorderBrush="{StaticResource BorderBrush}"
+                                                BorderThickness="2"
+                                                Background="Transparent"
+                                                Cursor="Hand" VerticalAlignment="Center">
+                                            <Button Command="{Binding DataContext.ToggleCompleteCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Width="22" Height="22" Cursor="Hand" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock FontSize="14" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       Text="{Binding Title}" />
+                                            <TextBlock FontSize="11"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Visibility="{Binding DueDate, Converter={x:Null}}">
+                                                <Run Text="Due: " />
+                                                <Run Text="{Binding DueDate, StringFormat={}{0:MMM d}}" />
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <!-- Priority Badge -->
+                                        <Border Grid.Column="2" Margin="0,0,8,0"
+                                                VerticalAlignment="Center">
+                                            <Border.Style>
+                                                <Style TargetType="Border" BasedOn="{StaticResource PriorityBadgeStyle}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Priority}" Value="High">
+                                                            <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Priority}" Value="Medium">
+                                                            <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Priority}" Value="Low">
+                                                            <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock>
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="High">
+                                                                <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="Medium">
+                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="Low">
+                                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                                <Run Text="{Binding Priority}" />
+                                            </TextBlock>
+                                        </Border>
+
+                                        <Button Grid.Column="3" Width="28" Height="28"
+                                                Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" VerticalAlignment="Center"
+                                                Command="{Binding DataContext.DeleteItemCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="M6 18L18 6M6 6l12 12"
+                                                  Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.5"
+                                                  Width="14" Height="14" Stretch="Uniform" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty state -->
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                               Text="No pending tasks" HorizontalAlignment="Center" Margin="0,8">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding PendingItems.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Completed Tasks -->
+            <Border Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="4" Height="20"
+                                Background="{StaticResource SuccessBrush}"
+                                CornerRadius="2" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Text="Completed" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding CompletedItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" Margin="0,0,0,8"
+                                        Background="{StaticResource BgBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1" CornerRadius="8" Opacity="0.6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Checked Icon -->
+                                        <Border Grid.Column="0" Width="22" Height="22"
+                                                CornerRadius="11" Margin="0,0,12,0"
+                                                Background="{StaticResource SuccessBrush}"
+                                                Cursor="Hand" VerticalAlignment="Center">
+                                            <Button Command="{Binding DataContext.ToggleCompleteCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Width="22" Height="22" Cursor="Hand">
+                                                <Path Data="M5 13l4 4L19 7"
+                                                      Stroke="White" StrokeThickness="2"
+                                                      Width="12" Height="12" Stretch="Uniform" />
+                                            </Button>
+                                        </Border>
+
+                                        <TextBlock Grid.Column="1" FontSize="14"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   Text="{Binding Title}"
+                                                   TextDecorations="Strikethrough"
+                                                   VerticalAlignment="Center" />
+
+                                        <Button Grid.Column="2" Width="28" Height="28"
+                                                Background="Transparent" BorderThickness="0"
+                                                Cursor="Hand" VerticalAlignment="Center"
+                                                Command="{Binding DataContext.DeleteItemCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="M6 18L18 6M6 6l12 12"
+                                                  Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.5"
+                                                  Width="14" Height="14" Stretch="Uniform" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty state -->
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                               Text="No completed tasks" HorizontalAlignment="Center" Margin="0,8">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CompletedItems.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+
+        <!-- Add Task Dialog -->
+        <Border Visibility="Collapsed" Background="#80000000" Panel.ZIndex="100">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsAddDialogOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border Width="420" Background="{StaticResource SurfaceBrush}"
+                    CornerRadius="16" Padding="28"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect BlurRadius="32" Opacity="0.2" ShadowDepth="8" Color="#000000" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="Add Task" Margin="0,0,0,20" />
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Title</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,12">
+                        <TextBox Text="{Binding FormTitle}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Priority</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,12">
+                        <ComboBox ItemsSource="{Binding FormPriorityOptions}"
+                                  Text="{Binding FormPriority}"
+                                  Padding="8,6" BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Due Date</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,20">
+                        <DatePicker SelectedDate="{Binding FormDueDate}"
+                                    BorderThickness="0" Padding="6" />
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" CornerRadius="8"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                Margin="0,0,12,0">
+                            <Button Content="Cancel"
+                                    Command="{Binding CloseAddDialogCommand}"
+                                    Background="Transparent"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    BorderThickness="0" Padding="16,10" />
+                        </Border>
+                        <Border Grid.Column="1" CornerRadius="8"
+                                Background="{StaticResource PrimaryBrush}">
+                            <Button Content="Add Task"
+                                    Command="{Binding AddItemCommand}"
+                                    Background="Transparent"
+                                    Foreground="White" BorderThickness="0" Padding="24,10" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

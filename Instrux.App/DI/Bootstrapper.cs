@@ -3,6 +3,7 @@ using Instrux.App.Services;
 using Instrux.App.ViewModels;
 using Instrux.App.ViewModels.Tabs;
 using Instrux.App.Views;
+using Instrux.App.Views.Tabs;
 using Instrux.Infrastructure;
 using Instrux.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public static class Bootstrapper
                 services.AddSingleton<INavigationService, NavigationService>();
                 services.AddSingleton<AppDataStore>();
 
+                // Existing tab VMs (needed for admin views)
                 services.AddTransient<TeacherProfileTabViewModel>();
                 services.AddTransient<SchoolClassTabViewModel>();
                 services.AddTransient<StudentTabViewModel>();
@@ -43,6 +45,29 @@ public static class Bootstrapper
                 services.AddTransient<CalendarEventTabViewModel>();
                 services.AddTransient<TodoItemTabViewModel>();
 
+                // Phase 1 - Foundation
+                services.AddSingleton<DashboardViewModel>();
+
+                // Phase 2 - Class Management
+                services.AddTransient<TabRosterViewModel>();
+                services.AddTransient<TabAttendanceViewModel>();
+                services.AddTransient<ClassDetailViewModel>();
+                services.AddTransient<ClassManagerViewModel>();
+
+                // Phase 3 - Content & Grades sub-tabs
+                services.AddTransient<TabMaterialsViewModel>();
+                services.AddTransient<TabGradesViewModel>();
+
+                // Phase 4 - Full-page views
+                services.AddSingleton<CalendarViewModel>();
+                services.AddSingleton<TodoViewModel>();
+                services.AddTransient<SettingsViewModel>();
+                services.AddTransient<OnboardingViewModel>();
+
+                // Phase 4 - Windows
+                services.AddTransient<OnboardingWindow>();
+
+                // Main
                 services.AddTransient<MainViewModel>();
                 services.AddTransient<MainWindow>();
             })

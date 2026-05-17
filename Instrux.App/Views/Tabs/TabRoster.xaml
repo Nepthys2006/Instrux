@@ -1,0 +1,189 @@
+<UserControl x:Class="Instrux.App.Views.Tabs.TabRoster"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dto="clr-namespace:Instrux.Services.DTOs;assembly=Instrux.Services"
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="800">
+    <Grid>
+        <StackPanel>
+            <!-- Header -->
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="Class Roster" />
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,2,0,0">
+                        <Run Text="Manage students enrolled in this class" />
+                    </TextBlock>
+                </StackPanel>
+                <Border Grid.Column="1" CornerRadius="8"
+                        Background="{StaticResource PrimaryBrush}">
+                    <Button Command="{Binding RosterView.OpenAddDialogCommand}"
+                            Background="Transparent"
+                            Foreground="White" BorderThickness="0"
+                            Padding="14,8" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M12 4v16m8-8H4" Stroke="White" StrokeThickness="2"
+                                  Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                            <TextBlock Text="Add Student" FontSize="13" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+            </Grid>
+
+            <!-- Student Cards -->
+            <ItemsControl ItemsSource="{Binding RosterView.Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="260" Margin="0,0,12,12"
+                                Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                CornerRadius="10" Padding="16">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="8" Opacity="0.06"
+                                                              ShadowDepth="1" Color="#000000" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Border.Style>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Avatar -->
+                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20"
+                                        Background="{StaticResource PrimaryLightBrush}"
+                                        Margin="0,0,12,0">
+                                    <TextBlock Text="S"
+                                               FontSize="16" FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+
+                                <!-- Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}"
+                                               Text="{Binding Name}" />
+                                    <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
+                                               Text="{Binding StudentIdentifier}" />
+                                </StackPanel>
+
+                                <!-- Delete Button -->
+                                <Button Grid.Column="2" Width="28" Height="28"
+                                        Background="Transparent" BorderThickness="0"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding DataContext.RosterView.DeleteStudentCommand,
+                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Path Data="M6 18L18 6M6 6l12 12"
+                                          Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.5"
+                                          Width="14" Height="14" Stretch="Uniform" />
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- Add Student Dialog Overlay -->
+        <Border Visibility="Collapsed" Background="#80000000" Panel.ZIndex="100">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding RosterView.IsAddDialogOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border Width="400" Background="{StaticResource SurfaceBrush}"
+                    CornerRadius="16" Padding="28"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect BlurRadius="32" Opacity="0.2" ShadowDepth="8" Color="#000000" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}"
+                               Text="Add Student" Margin="0,0,0,20" />
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Student Name</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,12">
+                        <TextBox Text="{Binding RosterView.FormName}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">ID / Identifier</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,12">
+                        <TextBox Text="{Binding RosterView.FormStudentIdentifier}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,4">Email</TextBlock>
+                    <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" Margin="0,0,0,20">
+                        <TextBox Text="{Binding RosterView.FormEmail}" Padding="10,8"
+                                 BorderThickness="0" FontSize="13" />
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" CornerRadius="8"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                Margin="0,0,12,0">
+                            <Button Content="Cancel"
+                                    Command="{Binding RosterView.CloseAddDialogCommand}"
+                                    Background="Transparent"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    BorderThickness="0" Padding="16,10" />
+                        </Border>
+                        <Border Grid.Column="1" CornerRadius="8"
+                                Background="{StaticResource PrimaryBrush}">
+                            <Button Content="Add Student"
+                                    Command="{Binding RosterView.AddStudentCommand}"
+                                    Background="Transparent"
+                                    Foreground="White" BorderThickness="0" Padding="24,10" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

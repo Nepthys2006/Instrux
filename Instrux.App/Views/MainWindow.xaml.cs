@@ -1,4 +1,6 @@
 using Instrux.App.ViewModels;
+using Syncfusion.SfSkinManager;
+using System;
 using System.Windows;
 
 namespace Instrux.App.Views;
@@ -9,5 +11,14 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
+
+        try
+        {
+            SfSkinManager.SetTheme(this, new Theme("Windows11Light"));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Theme initialization failed: {ex.Message}");
+        }
     }
 }

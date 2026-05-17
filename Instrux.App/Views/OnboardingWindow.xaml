@@ -1,0 +1,286 @@
+<Window x:Class="Instrux.App.Views.OnboardingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Welcome to Instrux" Height="500" Width="560"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource SurfaceBrush}"
+        TextElement.FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow">
+    <Grid>
+        <StackPanel Margin="40">
+            <!-- Step Indicator -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,32">
+                <Border Width="32" Height="32" CornerRadius="16" Margin="0,0,4,0"
+                        Background="{StaticResource PrimaryBrush}">
+                    <TextBlock Text="1" FontSize="13" FontWeight="Bold"
+                               Foreground="White" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+                <Border Width="60" Height="2" VerticalAlignment="Center" Margin="0,0,4,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{StaticResource BorderBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+                <Border Width="32" Height="32" CornerRadius="16" Margin="0,0,4,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{StaticResource BorderBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Text="2" FontSize="13" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                        <Setter Property="Foreground" Value="White" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                        <Setter Property="Foreground" Value="White" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+
+            <!-- Step 1: Name -->
+            <StackPanel Visibility="Visible">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock FontSize="24" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}"
+                           Text="Welcome to Instrux!" HorizontalAlignment="Center"
+                           Margin="0,0,0,8" />
+                <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                           HorizontalAlignment="Center" Margin="0,0,0,32"
+                           Text="Let's get to know you" />
+
+                <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,0,0,4">What's your full name?</TextBlock>
+                <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" Margin="0,0,0,12">
+                    <TextBox Text="{Binding FullName}" Padding="12,10"
+                             BorderThickness="0" FontSize="14" />
+                </Border>
+            </StackPanel>
+
+            <!-- Step 2: Profile Details -->
+            <StackPanel Visibility="Collapsed">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock FontSize="24" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}"
+                           Text="Profile Details" HorizontalAlignment="Center"
+                           Margin="0,0,0,32" />
+
+                <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,0,0,4">Nickname (optional)</TextBlock>
+                <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" Margin="0,0,0,16">
+                    <TextBox Text="{Binding Nickname}" Padding="12,10"
+                             BorderThickness="0" FontSize="14" />
+                </Border>
+
+                <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,0,0,4">Email (optional)</TextBlock>
+                <Border CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" Margin="0,0,0,24">
+                    <TextBox Text="{Binding Email}" Padding="12,10"
+                             BorderThickness="0" FontSize="14" />
+                </Border>
+            </StackPanel>
+
+            <!-- Complete -->
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsComplete}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock FontSize="24" FontWeight="Bold"
+                           Foreground="{StaticResource TextBrush}"
+                           Text="You're all set!" HorizontalAlignment="Center"
+                           Margin="0,40,0,8" />
+                <TextBlock FontSize="14" Foreground="{StaticResource TextMutedBrush}"
+                           HorizontalAlignment="Center"
+                           Text="Let's start teaching" />
+            </StackPanel>
+
+            <!-- Error Message -->
+            <TextBlock Text="{Binding ErrorMessage}" FontSize="12"
+                       Foreground="{StaticResource ErrorBrush}"
+                       HorizontalAlignment="Center" Margin="0,0,0,12">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ErrorMessage}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Buttons -->
+            <Grid Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Previous (step 2 only) -->
+                <Border Grid.Column="0" CornerRadius="8"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        Visibility="Collapsed">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button Command="{Binding PreviousStepCommand}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            BorderThickness="0" Padding="24,10" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M15 19l-7-7 7-7"
+                                  Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.5"
+                                  Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                            <TextBlock Text="Back" FontSize="13" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Next / Finish -->
+                <Border Grid.Column="2" CornerRadius="8"
+                        Background="{StaticResource PrimaryBrush}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsComplete}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button Background="Transparent"
+                            Foreground="White" BorderThickness="0" Padding="32,10" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Command" Value="{Binding NextStepCommand}" />
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Next" FontSize="13" FontWeight="SemiBold" />
+                                            <Path Data="M9 5l7 7-7 7"
+                                                  Stroke="White" StrokeThickness="1.5"
+                                                  Width="14" Height="14" Stretch="Uniform" Margin="8,0,0,0" />
+                                        </StackPanel>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                        <Setter Property="Command" Value="{Binding FinishCommand}" />
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="M5 13l4 4L19 7"
+                                                          Stroke="White" StrokeThickness="2"
+                                                          Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" />
+                                                    <TextBlock Text="Get Started" FontSize="13" FontWeight="SemiBold" />
+                                                </StackPanel>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Border>
+
+                <!-- Close button after complete -->
+                <Button Grid.Column="2" Content="Open Dashboard"
+                        Command="{Binding CloseWindowCommand}"
+                        Background="{StaticResource PrimaryBrush}"
+                        Foreground="White" BorderThickness="0"
+                        Padding="32,10" Cursor="Hand" FontSize="13" FontWeight="SemiBold">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsComplete}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>
