@@ -1,3 +1,4 @@
+using Instrux.App.Data;
 using Instrux.App.Services;
 using Instrux.App.ViewModels;
 using Instrux.App.ViewModels.Tabs;
@@ -30,6 +31,7 @@ public static class Bootstrapper
                 services.AddInfrastructure(context.Configuration);
 
                 services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<AppDataStore>();
 
                 services.AddTransient<TeacherProfileTabViewModel>();
                 services.AddTransient<SchoolClassTabViewModel>();

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instrux.App.Data;
 using Instrux.App.Services;
 using Instrux.Services.DTOs;
 using Instrux.Services.Interfaces;
@@ -10,14 +11,10 @@ namespace Instrux.App.ViewModels.Tabs;
 public partial class StudentTabViewModel : ObservableObject
 {
     private readonly IStudentService _service;
-    private readonly ISchoolClassService _classService;
     private readonly INavigationService _navigationService;
 
-    [ObservableProperty]
-    private ObservableCollection<StudentDto> _items = [];
-
-    [ObservableProperty]
-    private ObservableCollection<SchoolClassDto> _classes = [];
+    public ObservableCollection<StudentDto> Items => AppDataStore.Instance.Students;
+    public ObservableCollection<SchoolClassDto> Classes => AppDataStore.Instance.SchoolClasses;
 
     [ObservableProperty]
     private StudentDto? _selectedItem;
@@ -38,15 +35,11 @@ public partial class StudentTabViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SaveButtonText))]
     private bool _isEditing;
 
-    [ObservableProperty]
-    private bool _isLoading;
-
     public string SaveButtonText => IsEditing ? "Update" : "Save";
 
-    public StudentTabViewModel(IStudentService service, ISchoolClassService classService, INavigationService navigationService)
+    public StudentTabViewModel(IStudentService service, INavigationService navigationService)
     {
         _service = service;
-        _classService = classService;
         _navigationService = navigationService;
     }
 
@@ -60,23 +53,6 @@ public partial class StudentTabViewModel : ObservableObject
             FormEmail = value.Email;
             IsEditing = true;
         }
-    }
-
-    [RelayCommand]
-    private async Task LoadAsync()
-    {
-        IsLoading = true;
-        try
-        {
-            var result = await _service.GetAllAsync();
-            if (result.IsSuccess && result.Data is not null)
-                Items = new ObservableCollection<StudentDto>(result.Data);
-
-            var classResult = await _classService.GetAllAsync();
-            if (classResult.IsSuccess && classResult.Data is not null)
-                Classes = new ObservableCollection<SchoolClassDto>(classResult.Data);
-        }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]
@@ -104,18 +80,19 @@ public partial class StudentTabViewModel : ObservableObject
         if (IsEditing && SelectedItem is not null)
         {
             var result = await _service.UpdateAsync(SelectedItem.Id, dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                var i = Items.IndexOf(SelectedItem);
+                if (i >= 0) Items[i] = result.Data;
                 AddNew();
             }
         }
         else
         {
             var result = await _service.CreateAsync(dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                Items.Add(result.Data);
                 AddNew();
             }
         }
@@ -128,7 +105,7 @@ public partial class StudentTabViewModel : ObservableObject
         var result = await _service.DeleteAsync(SelectedItem.Id);
         if (result.IsSuccess)
         {
-            await LoadAsync();
+            Items.Remove(SelectedItem);
             AddNew();
         }
     }

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instrux.App.Data;
 using Instrux.App.Services;
 using Instrux.Services.DTOs;
 using Instrux.Services.Interfaces;
@@ -12,8 +13,7 @@ public partial class TeacherProfileTabViewModel : ObservableObject
     private readonly ITeacherProfileService _service;
     private readonly INavigationService _navigationService;
 
-    [ObservableProperty]
-    private ObservableCollection<TeacherProfileDto> _items = [];
+    public ObservableCollection<TeacherProfileDto> Items => AppDataStore.Instance.TeacherProfiles;
 
     [ObservableProperty]
     private TeacherProfileDto? _selectedItem;
@@ -30,9 +30,6 @@ public partial class TeacherProfileTabViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SaveButtonText))]
     private bool _isEditing;
-
-    [ObservableProperty]
-    private bool _isLoading;
 
     public string SaveButtonText => IsEditing ? "Update" : "Save";
 
@@ -51,19 +48,6 @@ public partial class TeacherProfileTabViewModel : ObservableObject
             FormEmail = value.Email;
             IsEditing = true;
         }
-    }
-
-    [RelayCommand]
-    private async Task LoadAsync()
-    {
-        IsLoading = true;
-        try
-        {
-            var result = await _service.GetAllAsync();
-            if (result.IsSuccess && result.Data is not null)
-                Items = new ObservableCollection<TeacherProfileDto>(result.Data);
-        }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]
@@ -89,18 +73,19 @@ public partial class TeacherProfileTabViewModel : ObservableObject
         if (IsEditing && SelectedItem is not null)
         {
             var result = await _service.UpdateAsync(SelectedItem.Id, dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                var i = Items.IndexOf(SelectedItem);
+                if (i >= 0) Items[i] = result.Data;
                 AddNew();
             }
         }
         else
         {
             var result = await _service.CreateAsync(dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                Items.Add(result.Data);
                 AddNew();
             }
         }
@@ -113,7 +98,7 @@ public partial class TeacherProfileTabViewModel : ObservableObject
         var result = await _service.DeleteAsync(SelectedItem.Id);
         if (result.IsSuccess)
         {
-            await LoadAsync();
+            Items.Remove(SelectedItem);
             AddNew();
         }
     }

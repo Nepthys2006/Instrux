@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instrux.App.Data;
 using Instrux.App.Services;
 using Instrux.Services.DTOs;
 using Instrux.Services.Interfaces;
@@ -10,17 +11,11 @@ namespace Instrux.App.ViewModels.Tabs;
 public partial class AttendanceRecordTabViewModel : ObservableObject
 {
     private readonly IAttendanceRecordService _service;
-    private readonly ISchoolClassService _classService;
-    private readonly IStudentService _studentService;
     private readonly INavigationService _navigationService;
 
-    private List<StudentDto> _allStudents = [];
-
-    [ObservableProperty]
-    private ObservableCollection<AttendanceRecordDto> _items = [];
-
-    [ObservableProperty]
-    private ObservableCollection<SchoolClassDto> _classes = [];
+    public ObservableCollection<AttendanceRecordDto> Items => AppDataStore.Instance.AttendanceRecords;
+    public ObservableCollection<SchoolClassDto> Classes => AppDataStore.Instance.SchoolClasses;
+    private IEnumerable<StudentDto> AllStudents => AppDataStore.Instance.Students;
 
     [ObservableProperty]
     private ObservableCollection<StudentDto> _students = [];
@@ -49,16 +44,13 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
 
     public List<string> StatusOptions { get; } = ["Present", "Absent", "Late", "Excused"];
 
-    [ObservableProperty]
-    private bool _isLoading;
-
     public string SaveButtonText => IsEditing ? "Update" : "Save";
 
     partial void OnFormClassIdChanged(Guid value)
     {
         if (FormStudentId != Guid.Empty)
         {
-            var student = _allStudents.FirstOrDefault(s => s.Id == FormStudentId);
+            var student = AllStudents.FirstOrDefault(s => s.Id == FormStudentId);
             if (student is null || student.ClassId != value)
                 FormStudentId = Guid.Empty;
         }
@@ -69,7 +61,7 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
     {
         if (value != Guid.Empty && FormClassId == Guid.Empty)
         {
-            var student = _allStudents.FirstOrDefault(s => s.Id == value);
+            var student = AllStudents.FirstOrDefault(s => s.Id == value);
             if (student is not null)
                 FormClassId = student.ClassId;
         }
@@ -79,20 +71,16 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
     private void UpdateFilteredStudents()
     {
         var filtered = FormClassId == Guid.Empty
-            ? _allStudents
-            : _allStudents.Where(s => s.ClassId == FormClassId).ToList();
+            ? AllStudents
+            : AllStudents.Where(s => s.ClassId == FormClassId);
         Students = new ObservableCollection<StudentDto>(filtered);
     }
 
     public AttendanceRecordTabViewModel(
         IAttendanceRecordService service,
-        ISchoolClassService classService,
-        IStudentService studentService,
         INavigationService navigationService)
     {
         _service = service;
-        _classService = classService;
-        _studentService = studentService;
         _navigationService = navigationService;
     }
 
@@ -107,28 +95,6 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
             FormNote = value.Note;
             IsEditing = true;
         }
-    }
-
-    [RelayCommand]
-    private async Task LoadAsync()
-    {
-        IsLoading = true;
-        try
-        {
-            var result = await _service.GetAllAsync();
-            if (result.IsSuccess && result.Data is not null)
-                Items = new ObservableCollection<AttendanceRecordDto>(result.Data);
-
-            var classResult = await _classService.GetAllAsync();
-            if (classResult.IsSuccess && classResult.Data is not null)
-                Classes = new ObservableCollection<SchoolClassDto>(classResult.Data);
-
-            var studentResult = await _studentService.GetAllAsync();
-            if (studentResult.IsSuccess && studentResult.Data is not null)
-                _allStudents = studentResult.Data.ToList();
-            UpdateFilteredStudents();
-        }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]
@@ -158,18 +124,19 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
         if (IsEditing && SelectedItem is not null)
         {
             var result = await _service.UpdateAsync(SelectedItem.Id, dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                var i = Items.IndexOf(SelectedItem);
+                if (i >= 0) Items[i] = result.Data;
                 AddNew();
             }
         }
         else
         {
             var result = await _service.CreateAsync(dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                Items.Add(result.Data);
                 AddNew();
             }
         }
@@ -182,7 +149,7 @@ public partial class AttendanceRecordTabViewModel : ObservableObject
         var result = await _service.DeleteAsync(SelectedItem.Id);
         if (result.IsSuccess)
         {
-            await LoadAsync();
+            Items.Remove(SelectedItem);
             AddNew();
         }
     }

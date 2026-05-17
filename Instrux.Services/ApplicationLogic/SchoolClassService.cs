@@ -1,4 +1,3 @@
-using AutoMapper;
 using Instrux.Domain.Interfaces;
 using Instrux.Domain.Models;
 using Instrux.Services.Common;
@@ -11,16 +10,13 @@ public class SchoolClassService : ISchoolClassService
 {
     private readonly IRepository<SchoolClass> _repository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public SchoolClassService(
         IRepository<SchoolClass> repository,
-        IUnitOfWork unitOfWork,
-        IMapper mapper)
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
     public async Task<Result<SchoolClassDto>> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -29,22 +25,22 @@ public class SchoolClassService : ISchoolClassService
         var entity = entities.FirstOrDefault(e => e.Id == id);
         if (entity is null)
             return Result<SchoolClassDto>.Failure($"SchoolClass {id} not found.");
-        return Result<SchoolClassDto>.Success(_mapper.Map<SchoolClassDto>(entity));
+        return Result<SchoolClassDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result<IReadOnlyList<SchoolClassDto>>> GetAllAsync(CancellationToken ct = default)
     {
         var entities = await _repository.GetAllAsync(ct, sc => sc.Students);
         return Result<IReadOnlyList<SchoolClassDto>>.Success(
-            _mapper.Map<List<SchoolClassDto>>(entities));
+            entities.Select(MapToDto).ToList());
     }
 
     public async Task<Result<SchoolClassDto>> CreateAsync(CreateSchoolClassDto dto, CancellationToken ct = default)
     {
-        var entity = _mapper.Map<SchoolClass>(dto);
+        var entity = MapToEntity(dto);
         await _repository.AddAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
-        return Result<SchoolClassDto>.Success(_mapper.Map<SchoolClassDto>(entity));
+        return Result<SchoolClassDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result<SchoolClassDto>> UpdateAsync(Guid id, CreateSchoolClassDto dto, CancellationToken ct = default)
@@ -53,10 +49,10 @@ public class SchoolClassService : ISchoolClassService
         if (entity is null)
             return Result<SchoolClassDto>.Failure($"SchoolClass {id} not found.");
 
-        _mapper.Map(dto, entity);
+        ApplyDto(dto, entity);
         await _repository.UpdateAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
-        return Result<SchoolClassDto>.Success(_mapper.Map<SchoolClassDto>(entity));
+        return Result<SchoolClassDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken ct = default)
@@ -68,5 +64,35 @@ public class SchoolClassService : ISchoolClassService
         await _repository.DeleteAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
+    }
+
+    private static SchoolClassDto MapToDto(SchoolClass entity) => new()
+    {
+        Id = entity.Id,
+        Name = entity.Name,
+        Subject = entity.Subject,
+        Section = entity.Section,
+        Term = entity.Term,
+        ColorHex = entity.ColorHex,
+        CreatedAt = entity.CreatedAt,
+        StudentCount = entity.Students?.Count ?? 0
+    };
+
+    private static SchoolClass MapToEntity(CreateSchoolClassDto dto) => new()
+    {
+        Name = dto.Name,
+        Subject = dto.Subject,
+        Section = dto.Section,
+        Term = dto.Term,
+        ColorHex = dto.ColorHex
+    };
+
+    private static void ApplyDto(CreateSchoolClassDto dto, SchoolClass entity)
+    {
+        entity.Name = dto.Name;
+        entity.Subject = dto.Subject;
+        entity.Section = dto.Section;
+        entity.Term = dto.Term;
+        entity.ColorHex = dto.ColorHex;
     }
 }

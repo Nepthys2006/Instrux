@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentValidation;
 using Instrux.Services.ApplicationLogic;
 using Instrux.Services.Interfaces;
@@ -10,8 +9,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         services.AddScoped<ISchoolClassService, SchoolClassService>();
         services.AddScoped<ITeacherProfileService, TeacherProfileService>();

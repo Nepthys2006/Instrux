@@ -1,4 +1,3 @@
-using AutoMapper;
 using Instrux.Domain.Interfaces;
 using Instrux.Domain.Models;
 using Instrux.Services.Common;
@@ -11,16 +10,13 @@ public class TeacherProfileService : ITeacherProfileService
 {
     private readonly IRepository<TeacherProfile> _repository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public TeacherProfileService(
         IRepository<TeacherProfile> repository,
-        IUnitOfWork unitOfWork,
-        IMapper mapper)
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
     public async Task<Result<TeacherProfileDto>> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -28,22 +24,22 @@ public class TeacherProfileService : ITeacherProfileService
         var entity = await _repository.GetByIdAsync(id, ct);
         if (entity is null)
             return Result<TeacherProfileDto>.Failure($"TeacherProfile {id} not found.");
-        return Result<TeacherProfileDto>.Success(_mapper.Map<TeacherProfileDto>(entity));
+        return Result<TeacherProfileDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result<IReadOnlyList<TeacherProfileDto>>> GetAllAsync(CancellationToken ct = default)
     {
         var entities = await _repository.GetAllAsync(ct);
         return Result<IReadOnlyList<TeacherProfileDto>>.Success(
-            _mapper.Map<List<TeacherProfileDto>>(entities));
+            entities.Select(MapToDto).ToList());
     }
 
     public async Task<Result<TeacherProfileDto>> CreateAsync(CreateTeacherProfileDto dto, CancellationToken ct = default)
     {
-        var entity = _mapper.Map<TeacherProfile>(dto);
+        var entity = MapToEntity(dto);
         await _repository.AddAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
-        return Result<TeacherProfileDto>.Success(_mapper.Map<TeacherProfileDto>(entity));
+        return Result<TeacherProfileDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result<TeacherProfileDto>> UpdateAsync(Guid id, CreateTeacherProfileDto dto, CancellationToken ct = default)
@@ -52,10 +48,10 @@ public class TeacherProfileService : ITeacherProfileService
         if (entity is null)
             return Result<TeacherProfileDto>.Failure($"TeacherProfile {id} not found.");
 
-        _mapper.Map(dto, entity);
+        ApplyDto(dto, entity);
         await _repository.UpdateAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
-        return Result<TeacherProfileDto>.Success(_mapper.Map<TeacherProfileDto>(entity));
+        return Result<TeacherProfileDto>.Success(MapToDto(entity));
     }
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken ct = default)
@@ -67,5 +63,28 @@ public class TeacherProfileService : ITeacherProfileService
         await _repository.DeleteAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
+    }
+
+    private static TeacherProfileDto MapToDto(TeacherProfile entity) => new()
+    {
+        Id = entity.Id,
+        FullName = entity.FullName,
+        Nickname = entity.Nickname,
+        Email = entity.Email,
+        CreatedAt = entity.CreatedAt
+    };
+
+    private static TeacherProfile MapToEntity(CreateTeacherProfileDto dto) => new()
+    {
+        FullName = dto.FullName,
+        Nickname = dto.Nickname,
+        Email = dto.Email
+    };
+
+    private static void ApplyDto(CreateTeacherProfileDto dto, TeacherProfile entity)
+    {
+        entity.FullName = dto.FullName;
+        entity.Nickname = dto.Nickname;
+        entity.Email = dto.Email;
     }
 }

@@ -3,4 +3,5 @@
   <Project Path="Instrux.Services/Instrux.Services.csproj" />
   <Project Path="Instrux.Infrastructure/Instrux.Infrastructure.csproj" />
   <Project Path="Instrux.App/Instrux.App.csproj" />
+  <Project Path="Instrux.App.Tests/Instrux.App.Tests.csproj" />
 </Solution>

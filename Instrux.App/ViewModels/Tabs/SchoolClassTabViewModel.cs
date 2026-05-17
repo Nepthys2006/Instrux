@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instrux.App.Data;
 using Instrux.App.Services;
 using Instrux.Services.DTOs;
 using Instrux.Services.Interfaces;
@@ -12,8 +13,7 @@ public partial class SchoolClassTabViewModel : ObservableObject
     private readonly ISchoolClassService _service;
     private readonly INavigationService _navigationService;
 
-    [ObservableProperty]
-    private ObservableCollection<SchoolClassDto> _items = [];
+    public ObservableCollection<SchoolClassDto> Items => AppDataStore.Instance.SchoolClasses;
 
     [ObservableProperty]
     private SchoolClassDto? _selectedItem;
@@ -37,9 +37,6 @@ public partial class SchoolClassTabViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SaveButtonText))]
     private bool _isEditing;
 
-    [ObservableProperty]
-    private bool _isLoading;
-
     public string SaveButtonText => IsEditing ? "Update" : "Save";
 
     public SchoolClassTabViewModel(ISchoolClassService service, INavigationService navigationService)
@@ -59,19 +56,6 @@ public partial class SchoolClassTabViewModel : ObservableObject
             FormColorHex = value.ColorHex;
             IsEditing = true;
         }
-    }
-
-    [RelayCommand]
-    private async Task LoadAsync()
-    {
-        IsLoading = true;
-        try
-        {
-            var result = await _service.GetAllAsync();
-            if (result.IsSuccess && result.Data is not null)
-                Items = new ObservableCollection<SchoolClassDto>(result.Data);
-        }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]
@@ -101,18 +85,19 @@ public partial class SchoolClassTabViewModel : ObservableObject
         if (IsEditing && SelectedItem is not null)
         {
             var result = await _service.UpdateAsync(SelectedItem.Id, dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                var i = Items.IndexOf(SelectedItem);
+                if (i >= 0) Items[i] = result.Data;
                 AddNew();
             }
         }
         else
         {
             var result = await _service.CreateAsync(dto);
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data is not null)
             {
-                await LoadAsync();
+                Items.Add(result.Data);
                 AddNew();
             }
         }
@@ -125,7 +110,7 @@ public partial class SchoolClassTabViewModel : ObservableObject
         var result = await _service.DeleteAsync(SelectedItem.Id);
         if (result.IsSuccess)
         {
-            await LoadAsync();
+            Items.Remove(SelectedItem);
             AddNew();
         }
     }
